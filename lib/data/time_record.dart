@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../consts/value_consts.dart';
 
@@ -11,10 +12,19 @@ class TimeRecord{
 
   const TimeRecord._({this.startDateTimeString=ValueConsts.invalidDateTime,this.endDateTimeString=ValueConsts.invalidDateTime,this.category='',this.content=''});
 
-  factory TimeRecord.init({DateTime? startDateTime, DateTime? endDateTime, String category='', String content=''}){
+  factory TimeRecord.fromDateTime({DateTime? startDateTime, DateTime? endDateTime, String category='', String content=''}){
     return TimeRecord._(
       startDateTimeString: startDateTime?.toString()??ValueConsts.invalidDateTime,
       endDateTimeString: endDateTime?.toString()??ValueConsts.invalidDateTime,
+      category: category,
+      content: content,
+    );
+  }
+
+  factory TimeRecord.fromString({String startDateTime=ValueConsts.invalidDateTime, String endDateTime=ValueConsts.invalidDateTime, String category='', String content=''}){
+    return TimeRecord.fromDateTime(
+      startDateTime: _convertDateTime(startDateTime),
+      endDateTime: _convertDateTime(endDateTime),
       category: category,
       content: content,
     );
@@ -62,7 +72,15 @@ class TimeRecord{
   
   String _formatDateTime(DateTime? dateTime){
     if(dateTime==null){return '';}
-    return '${dateTime.hour.toString().padLeft(2)}:${dateTime.minute.toString().padLeft(2,'0')}';
+    DateFormat dateFormat = DateFormat.Hm();
+    return dateFormat.format(dateTime);
+  }
+
+  static DateTime? _convertDateTime(String string){
+    if(string==ValueConsts.invalidDateTime){
+      return null;
+    }
+    return DateTime.parse(string);
   }
   
   TimeRecord copyWith({DateTime? startDateTime, DateTime? endDateTime, String? category, String? content}){
