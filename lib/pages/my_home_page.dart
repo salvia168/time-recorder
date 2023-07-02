@@ -26,7 +26,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    futureRead = db.read();
+    futureRead = Future<List<TimeRecord>>(()async{
+      await db.init();
+      return await db.readAll();
+    });
     super.initState();
   }
 
@@ -50,8 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 SizedBox(width: 16,),
                 ElevatedButton(
-                  onPressed: () {
-                    _startRecord(content: _controller.text);
+                  onPressed: () async {
+                    await _startRecord(content: _controller.text);
                   },
                   child: Text('開始'),
                 ),
@@ -94,8 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           var now = DateTime.now();
                           return (element.startDateTime?.compareTo(
                                       DateTime(now.year, now.month, now.day)) ??
-                                  -1) >=
-                              0;
+                                  -1) >= 0;
                         })
                         .map((x) => _makeRow(x))
                         .toList(),
@@ -140,25 +142,21 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _stopRecord() async {
+  _stopRecord()async {
     DateTime endTime = DateTime.now();
     if (recordingData == null) {
       return;
     }
-    setState(() {
-      list = list.map((e) {
-        if (e.startDateTime == recordingData!.startDateTime) {
-          return e.copyWith(endDateTime: endTime);
-        }
-        return e;
-      }).toList();
+    setState((){
+      list.remove(recordingData);
+      list.add(recordingData!.copyWith(endDateTime: endTime));
     });
-    db.write(recordingData!.copyWith(endDateTime: endTime));
+    await db.create(recordingData!.copyWith(endDateTime: endTime));
     recordingData = null;
   }
 
-  _startRecord({String content = ''}) {
-    _stopRecord();
+  _startRecord({String content = ''})async {
+    await _stopRecord();
     recordingData = TimeRecord.fromDateTime(
         startDateTime: DateTime.now(), category: 'テストPJ', content: content);
     setState(() {

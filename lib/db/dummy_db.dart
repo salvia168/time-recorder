@@ -11,19 +11,22 @@ class DummyDb implements DbBase{
   }
 
   @override
-  Future<List<TimeRecord>> read()async{
+  Future<List<TimeRecord>> readAll()async{
     return _data;
   }
 
   @override
-  Future write(TimeRecord timeRecord) async {
-    // TODO: implement write
-    throw UnimplementedError();
+  Future create(TimeRecord timeRecord) async {
+    _data.add(timeRecord);
   }
 
   @override
-  Future writeAll(List<TimeRecord> timeRecords) async {
-    // TODO: implement writeAll
-    throw UnimplementedError();
+  Future createAll(List<TimeRecord> timeRecords) async {
+    _data.addAll(timeRecords);
+  }
+
+  @override
+  Future init() async{
+    return await null;
   }
 }
