@@ -38,71 +38,74 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: _controller,
+        child: Padding(
+          padding: StyleConsts.padding16,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: [
+                  SizedBox(
+                    width: 300,
+                    child: TextField(
+                      controller: _controller,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16,),
-                ElevatedButton(
-                  onPressed: () async {
-                    await _startRecord(content: _controller.text);
-                  },
-                  child: const Text('開始'),
-                ),
-                const SizedBox(width: 16,),
-                ElevatedButton(
-                  onPressed: _stopRecord,
-                  child: const Text('停止'),
-                ),
-              ],
-            ),
-            // Row(
-            //   children: [
-            //     ElevatedButton(
-            //       onPressed: () {
-            //         _startRecord(content: '朝会');
-            //       },
-            //       child: Text('朝会'),
-            //     ),
-            //     ElevatedButton(
-            //       onPressed: _stopRecord,
-            //       child: Text('停止'),
-            //     ),
-            //   ],
-            // ),
-            Text(
-              _dateFormat.format(DateTime.now()),
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            FutureBuilder<List<TimeRecord>>(
-                future: futureRead,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    list = snapshot.data!;
-                  }
-                  return DataTable(
-                    showCheckboxColumn: true,
-                    columns: _makeColumns(),
-                    rows: list
-                        .where((element) {
-                          var now = DateTime.now();
-                          return (element.startDateTime?.compareTo(
-                                      DateTime(now.year, now.month, now.day)) ??
-                                  -1) >= 0;
-                        })
-                        .map((x) => _makeRow(x))
-                        .toList(),
-                  );
-                }),
-          ],
-        ),
+                  StyleConsts.sizedBoxW16,
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _startRecord(content: _controller.text);
+                    },
+                    child: const Text('開始'),
+                  ),
+                  StyleConsts.sizedBoxW16,
+                  ElevatedButton(
+                    onPressed: _stopRecord,
+                    child: const Text('停止'),
+                  ),
+                ],
+              ),
+              // Row(
+              //   children: [
+              //     ElevatedButton(
+              //       onPressed: () {
+              //         _startRecord(content: '朝会');
+              //       },
+              //       child: Text('朝会'),
+              //     ),
+              //     ElevatedButton(
+              //       onPressed: _stopRecord,
+              //       child: Text('停止'),
+              //     ),
+              //   ],
+              // ),
+              Text(
+                _dateFormat.format(DateTime.now()),
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              FutureBuilder<List<TimeRecord>>(
+                  future: futureRead,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      list = snapshot.data!;
+                    }
+                    return DataTable(
+                      showCheckboxColumn: true,
+                      columns: _makeColumns(),
+                      rows: list
+                          .where((element) {
+                        var now = DateTime.now();
+                        return (element.startDateTime?.compareTo(
+                            DateTime(now.year, now.month, now.day)) ??
+                            -1) >= 0;
+                      })
+                          .map((x) => _makeRow(x))
+                          .toList(),
+                    );
+                  }),
+            ],
+          ),
+        )
       ),
     );
   }

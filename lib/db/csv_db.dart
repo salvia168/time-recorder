@@ -50,7 +50,7 @@ class CsvDb implements DbBase {
   @override
   Future init() async {
     if (!await dbFile.exists()) {
-      dbFile.writeAsString('ver. 0.0.1');
+      await dbFile.writeAsString('ver. 0.0.1');
     }
   }
 

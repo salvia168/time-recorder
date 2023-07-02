@@ -4,24 +4,37 @@ import 'package:intl/intl.dart';
 import '../consts/value_consts.dart';
 
 @immutable
-class TimeRecord{
+class TimeRecord {
   final String startDateTimeString;
   final String endDateTimeString;
   final String category;
   final String content;
 
-  const TimeRecord._({this.startDateTimeString=ValueConsts.invalidDateTime,this.endDateTimeString=ValueConsts.invalidDateTime,this.category='',this.content=''});
+  const TimeRecord._(
+      {this.startDateTimeString = ValueConsts.invalidDateTime,
+      this.endDateTimeString = ValueConsts.invalidDateTime,
+      this.category = '',
+      this.content = ''});
 
-  factory TimeRecord.fromDateTime({DateTime? startDateTime, DateTime? endDateTime, String category='', String content=''}){
+  factory TimeRecord.fromDateTime(
+      {DateTime? startDateTime,
+      DateTime? endDateTime,
+      String category = '',
+      String content = ''}) {
     return TimeRecord._(
-      startDateTimeString: startDateTime?.toString()??ValueConsts.invalidDateTime,
-      endDateTimeString: endDateTime?.toString()??ValueConsts.invalidDateTime,
+      startDateTimeString:
+          startDateTime?.toString() ?? ValueConsts.invalidDateTime,
+      endDateTimeString: endDateTime?.toString() ?? ValueConsts.invalidDateTime,
       category: category,
       content: content,
     );
   }
 
-  factory TimeRecord.fromString({String startDateTime=ValueConsts.invalidDateTime, String endDateTime=ValueConsts.invalidDateTime, String category='', String content=''}){
+  factory TimeRecord.fromString(
+      {String startDateTime = ValueConsts.invalidDateTime,
+      String endDateTime = ValueConsts.invalidDateTime,
+      String category = '',
+      String content = ''}) {
     return TimeRecord.fromDateTime(
       startDateTime: _convertDateTime(startDateTime),
       endDateTime: _convertDateTime(endDateTime),
@@ -30,65 +43,72 @@ class TimeRecord{
     );
   }
 
-  DateTime? get startDateTime{
-    if(startDateTimeString==ValueConsts.invalidDateTime){
+  DateTime? get startDateTime {
+    if (startDateTimeString == ValueConsts.invalidDateTime) {
       return null;
     }
     return DateTime.parse(startDateTimeString);
   }
 
-  DateTime? get endDateTime{
-    if(endDateTimeString==ValueConsts.invalidDateTime){
+  DateTime? get endDateTime {
+    if (endDateTimeString == ValueConsts.invalidDateTime) {
       return null;
     }
     return DateTime.parse(endDateTimeString);
   }
-  
-  String get formattedStartDateTime{
+
+  String get formattedStartDateTime {
     return _formatDateTime(startDateTime);
   }
-  
-  String get formattedEndDateTime{
+
+  String get formattedEndDateTime {
     return _formatDateTime(endDateTime);
   }
-  
-  String get formattedSpanHour{
+
+  String get formattedSpanHour {
     var span = _span;
-    if(span==null){
+    if (span == null) {
       return '';
     }
-    if(Duration.zero.compareTo(span)>=0){
+    if (Duration.zero.compareTo(span) >= 0) {
       return 'ERROR';
     }
-    return (span.inMinutes/60).toStringAsFixed(2);
+    return (span.inMinutes / 60).toStringAsFixed(2);
   }
-  
-  Duration? get _span{
-    if(startDateTimeString==ValueConsts.invalidDateTime||endDateTimeString==ValueConsts.invalidDateTime){
+
+  Duration? get _span {
+    if (startDateTimeString == ValueConsts.invalidDateTime ||
+        endDateTimeString == ValueConsts.invalidDateTime) {
       return null;
     }
     return endDateTime!.difference(startDateTime!);
   }
-  
-  String _formatDateTime(DateTime? dateTime){
-    if(dateTime==null){return '';}
+
+  String _formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) {
+      return '';
+    }
     DateFormat dateFormat = DateFormat.Hm();
     return dateFormat.format(dateTime);
   }
 
-  static DateTime? _convertDateTime(String string){
-    if(string==ValueConsts.invalidDateTime){
+  static DateTime? _convertDateTime(String string) {
+    if (string == ValueConsts.invalidDateTime) {
       return null;
     }
     return DateTime.parse(string);
   }
-  
-  TimeRecord copyWith({DateTime? startDateTime, DateTime? endDateTime, String? category, String? content}){
+
+  TimeRecord copyWith(
+      {DateTime? startDateTime,
+      DateTime? endDateTime,
+      String? category,
+      String? content}) {
     return TimeRecord._(
-      startDateTimeString: startDateTime?.toString()??startDateTimeString,
-      endDateTimeString: endDateTime?.toString()??endDateTimeString,
-      category: category??this.category,
-      content: content??this.content,
+      startDateTimeString: startDateTime?.toString() ?? startDateTimeString,
+      endDateTimeString: endDateTime?.toString() ?? endDateTimeString,
+      category: category ?? this.category,
+      content: content ?? this.content,
     );
   }
 }
