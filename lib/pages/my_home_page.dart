@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:time_recorder/data/time_record.dart';
 import 'package:time_recorder/db/csv_db.dart';
 import 'package:time_recorder/db/db_base.dart';
-import 'package:time_recorder/db/dummy_db.dart';
 import '../consts/style_consts.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -18,10 +16,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<TimeRecord> list = [];
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   DbBase db = CsvDb();
   Future<List<TimeRecord>>? futureRead;
-  DateFormat _dateFormat = DateFormat('yyyy/MM/dd');
+  final DateFormat _dateFormat = DateFormat('yyyy/MM/dd');
   TimeRecord? recordingData;
 
   @override
@@ -51,17 +49,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     controller: _controller,
                   ),
                 ),
-                SizedBox(width: 16,),
+                const SizedBox(width: 16,),
                 ElevatedButton(
                   onPressed: () async {
                     await _startRecord(content: _controller.text);
                   },
-                  child: Text('開始'),
+                  child: const Text('開始'),
                 ),
-                SizedBox(width: 16,),
+                const SizedBox(width: 16,),
                 ElevatedButton(
                   onPressed: _stopRecord,
-                  child: Text('停止'),
+                  child: const Text('停止'),
                 ),
               ],
             ),
