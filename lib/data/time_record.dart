@@ -9,24 +9,28 @@ class TimeRecord {
   final String endDateTimeString;
   final String category;
   final String content;
+  final bool isRecording;
 
   const TimeRecord._(
       {this.startDateTimeString = ValueConsts.invalidDateTime,
       this.endDateTimeString = ValueConsts.invalidDateTime,
       this.category = '',
-      this.content = ''});
+      this.content = '',
+      this.isRecording = false});
 
   factory TimeRecord.fromDateTime(
       {DateTime? startDateTime,
       DateTime? endDateTime,
       String category = '',
-      String content = ''}) {
+      String content = '',
+      bool isRecording = false,}) {
     return TimeRecord._(
       startDateTimeString:
           startDateTime?.toString() ?? ValueConsts.invalidDateTime,
       endDateTimeString: endDateTime?.toString() ?? ValueConsts.invalidDateTime,
       category: category,
       content: content,
+      isRecording: isRecording,
     );
   }
 
@@ -34,12 +38,14 @@ class TimeRecord {
       {String startDateTime = ValueConsts.invalidDateTime,
       String endDateTime = ValueConsts.invalidDateTime,
       String category = '',
-      String content = ''}) {
+      String content = '',
+      bool isRecording = false,}) {
     return TimeRecord.fromDateTime(
       startDateTime: _convertDateTime(startDateTime),
       endDateTime: _convertDateTime(endDateTime),
       category: category,
       content: content,
+      isRecording: isRecording,
     );
   }
 
@@ -103,12 +109,13 @@ class TimeRecord {
       {DateTime? startDateTime,
       DateTime? endDateTime,
       String? category,
-      String? content}) {
+      String? content, bool? isRecording}) {
     return TimeRecord._(
       startDateTimeString: startDateTime?.toString() ?? startDateTimeString,
       endDateTimeString: endDateTime?.toString() ?? endDateTimeString,
       category: category ?? this.category,
       content: content ?? this.content,
+      isRecording: isRecording ?? this.isRecording,
     );
   }
 }

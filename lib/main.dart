@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'consts/style_consts.dart';
 import 'pages/my_home_page.dart';
 
 void main() {
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.blueGrey,
+        appBarTheme: Theme.of(context).appBarTheme.copyWith(titleSpacing: StyleConsts.value32),
       ),
       home: const MyHomePage(title: 'タイム レコーダー'),
     );
