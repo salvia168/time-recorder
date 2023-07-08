@@ -184,36 +184,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      width: StyleConsts.value80,
-                      child: TextField(
-                        enabled: false,
-                        controller: _updateStartTimeController,
-                        decoration: InputDecoration(
-                          labelText: '開始',
-                          hintText: timeRecord.formattedStartDateTime,
-                          // suffix: IconButton(
-                          //   icon: const Icon(Icons.schedule_outlined),
-                          //   onPressed: () async {
-                          //     await showTimePicker(
-                          //       context: context,
-                          //       initialTime: TimeOfDay(hour: 1, minute: 30),
-                          //     );
-                          //   },
-                          // ),
-                        ),
-                      ),
+                      width: StyleConsts.value128,
+                      child: _createTimeTextField(controller: _updateStartTimeController, labelText: '開始', dateTime: timeRecord.startDateTime,),
                     ),
                     StyleConsts.sizedBoxW16,
                     SizedBox(
-                      width: StyleConsts.value80,
-                      child: TextField(
-                        enabled: false,
-                        controller: _updateEndTimeController,
-                        decoration: InputDecoration(
-                          labelText: '終了',
-                          hintText: timeRecord.formattedEndDateTime,
-                        ),
-                      ),
+                      width: StyleConsts.value128,
+                      child: _createTimeTextField(controller: _updateEndTimeController, labelText: '終了', dateTime: timeRecord.endDateTime,),
                     ),
                     StyleConsts.sizedBoxW16,
                     SizedBox(
@@ -221,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: TextField(
                         enabled: false,
                         controller: _updateSpanController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: '時間',
                         ),
                       ),
@@ -263,6 +240,26 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ],
+        )
+      ),
+    );
+  }
+
+  TextField _createTimeTextField({required TextEditingController controller,required String labelText,required DateTime? dateTime}){
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: dateTime == null ? 'hh:mm' : DateFormat.Hm().format(dateTime),
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.schedule_outlined),
+          onPressed: ()async{
+            var time = await showTimePicker(context: context,initialTime: TimeOfDay(hour: dateTime?.hour ?? 0,minute: dateTime?.minute ?? 0,),);
+            if(time!=null){
+              print('時間：${DateFormat.Hm().format(DateTime(1,1,1,time.hour,time.minute))}');
+              controller.text = DateFormat.Hm().format(DateTime(1,1,1,time.hour,time.minute));
+            }
+          },
         )
       ),
     );
