@@ -5,6 +5,9 @@ import '../consts/value_consts.dart';
 
 @immutable
 class TimeRecord {
+  static final DateFormat _timeFormat = DateFormat.Hm();
+  static final DateFormat _dateFormat = DateFormat('yyyy/MM/dd');
+
   final String startDateTimeString;
   final String endDateTimeString;
   final String category;
@@ -63,12 +66,20 @@ class TimeRecord {
     return DateTime.parse(endDateTimeString);
   }
 
-  String get formattedStartDateTime {
-    return _formatDateTime(startDateTime);
+  String get formattedStartDate {
+    return _formatDate(startDateTime);
   }
 
-  String get formattedEndDateTime {
-    return _formatDateTime(endDateTime);
+  String get formattedEndDate {
+    return _formatDate(endDateTime);
+  }
+
+  String get formattedStartTime {
+    return _formatTime(startDateTime);
+  }
+
+  String get formattedEndTime {
+    return _formatTime(endDateTime);
   }
 
   String get formattedSpanHour {
@@ -90,12 +101,11 @@ class TimeRecord {
     return endDateTime!.difference(startDateTime!);
   }
 
-  String _formatDateTime(DateTime? dateTime) {
+  String _formatTime(DateTime? dateTime) {
     if (dateTime == null) {
       return '';
     }
-    DateFormat dateFormat = DateFormat.Hm();
-    return dateFormat.format(dateTime);
+    return _timeFormat.format(dateTime);
   }
 
   static DateTime? _convertDateTime(String string) {
@@ -103,6 +113,13 @@ class TimeRecord {
       return null;
     }
     return DateTime.parse(string);
+  }
+
+  String _formatDate(DateTime? dateTime){
+    if (dateTime == null) {
+      return '';
+    }
+    return _dateFormat.format(dateTime);
   }
 
   TimeRecord copyWith(

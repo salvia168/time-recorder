@@ -17,9 +17,9 @@ class StyleConsts {
   static const EdgeInsets padding16 = EdgeInsets.all(value16);
   static const EdgeInsets padding32 = EdgeInsets.all(value32);
 
-  static const SizedBox sizedBoxW16 = SizedBox(width: value16);
   static const SizedBox sizedBoxH16 = SizedBox(height: value16);
   static const SizedBox sizedBoxH32 = SizedBox(height: value32);
+  static const SizedBox sizedBoxW16 = SizedBox(width: value16);
   static const SizedBox sizedBoxH48 = SizedBox(height: value48);
   static const SizedBox sizedBox0 = SizedBox.shrink();
 }
