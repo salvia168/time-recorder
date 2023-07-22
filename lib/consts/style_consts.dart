@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class StyleConsts {
+
+  StyleConsts._();
   static const TextStyle fontBold = TextStyle(fontWeight: FontWeight.bold);
 
   static const double value4 = 4;
