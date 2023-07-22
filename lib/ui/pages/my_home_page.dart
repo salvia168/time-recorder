@@ -222,6 +222,14 @@ class _MyHomePageState extends State<MyHomePage> {
 // =======
         appBar: AppBar(
           title: Text(widget.title),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: (){
+
+              },
+            ),
+          ],
         ),
         body: Row(
           mainAxisSize: MainAxisSize.max,

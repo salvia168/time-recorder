@@ -39,8 +39,8 @@ class _RecordContentState extends State<RecordContent> {
     // List<String> labels = ['開始', '終了', '時間', 'カテゴリ', '内容'];
     // List<bool> isNumericList = [true, true, true, false, false];
 
-    List<String> labels = ['日付','開始', '終了', '時間', '内容'];
-    List<bool> isNumericList = [false,true, true, true, false];
+    List<String> labels = ['日付','開始', '終了', '時間', 'カテゴリ', '内容'];
+    List<bool> isNumericList = [false,true, true, true, false, false];
     for (int i = 0; i < labels.length; i++) {
       columns.add(DataColumn(
         numeric: isNumericList[i],
@@ -62,7 +62,7 @@ class _RecordContentState extends State<RecordContent> {
         DataCell(SelectableText(timeRecord.formattedStartTime)),
         DataCell(SelectableText(timeRecord.formattedEndTime)),
         DataCell(SelectableText(timeRecord.formattedSpanHour)),
-        // DataCell(SelectableText(timeRecord.category)),
+        DataCell(SelectableText(timeRecord.category)),
         DataCell(SelectableText(timeRecord.content)),
       ],
     );
