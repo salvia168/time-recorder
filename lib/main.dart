@@ -17,7 +17,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.blueGrey,
-        appBarTheme: Theme.of(context).appBarTheme.copyWith(titleSpacing: StyleConsts.value32),
       ),
       home: const MyHomePage(title: 'タイム レコーダー'),
     );

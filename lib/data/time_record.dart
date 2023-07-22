@@ -1,12 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../consts/value_consts.dart';
+import '../util/date_time_util.dart';
 
 @immutable
 class TimeRecord {
-  static final DateFormat _timeFormat = DateFormat.Hm();
-  static final DateFormat _dateFormat = DateFormat('yyyy/MM/dd');
+  static final DateFormat _dateFormat = DateFormat(ValueConsts.dateFormatPattern);
 
   final String startDateTimeString;
   final String endDateTimeString;
@@ -21,12 +22,13 @@ class TimeRecord {
       this.content = '',
       this.isRecording = false});
 
-  factory TimeRecord.fromDateTime(
-      {DateTime? startDateTime,
-      DateTime? endDateTime,
-      String category = '',
-      String content = '',
-      bool isRecording = false,}) {
+  factory TimeRecord.fromDateTime({
+    DateTime? startDateTime,
+    DateTime? endDateTime,
+    String category = '',
+    String content = '',
+    bool isRecording = false,
+  }) {
     return TimeRecord._(
       startDateTimeString:
           startDateTime?.toString() ?? ValueConsts.invalidDateTime,
@@ -37,15 +39,37 @@ class TimeRecord {
     );
   }
 
-  factory TimeRecord.fromString(
-      {String startDateTime = ValueConsts.invalidDateTime,
-      String endDateTime = ValueConsts.invalidDateTime,
-      String category = '',
-      String content = '',
-      bool isRecording = false,}) {
+  factory TimeRecord.fromString({
+    String startDateTime = ValueConsts.invalidDateTime,
+    String endDateTime = ValueConsts.invalidDateTime,
+    String category = '',
+    String content = '',
+    bool isRecording = false,
+  }) {
     return TimeRecord.fromDateTime(
       startDateTime: _convertDateTime(startDateTime),
       endDateTime: _convertDateTime(endDateTime),
+      category: category,
+      content: content,
+      isRecording: isRecording,
+    );
+  }
+
+  factory TimeRecord.fromHmString({
+    DateTime? startDate,
+    String startTimeString = ValueConsts.invalidDateTime,
+    DateTime? endDate,
+    String endTimeString = ValueConsts.invalidDateTime,
+    String category = '',
+    String content = '',
+    bool isRecording = false,
+  }) {
+    var startDateTime = _convertHm(startDate, startTimeString);
+    var endDateTime = _convertHm(endDate, endTimeString);
+    return TimeRecord._(
+      startDateTimeString:
+      startDateTime?.toString() ?? ValueConsts.invalidDateTime,
+      endDateTimeString: endDateTime?.toString() ?? ValueConsts.invalidDateTime,
       category: category,
       content: content,
       isRecording: isRecording,
@@ -87,8 +111,8 @@ class TimeRecord {
     if (span == null) {
       return '';
     }
-    if (Duration.zero.compareTo(span) >= 0) {
-      return 'ERROR';
+    if (Duration.zero.compareTo(span) > 0) {
+      return ValueConsts.errorString;
     }
     return (span.inMinutes / 60).toStringAsFixed(2);
   }
@@ -105,17 +129,29 @@ class TimeRecord {
     if (dateTime == null) {
       return '';
     }
-    return _timeFormat.format(dateTime);
+    return ValueConsts.hmFormat.format(dateTime);
   }
 
   static DateTime? _convertDateTime(String string) {
     if (string == ValueConsts.invalidDateTime) {
       return null;
     }
-    return DateTime.parse(string);
+    var dateTime = DateTime.parse(string);
+    return DateTimeUtil.copy(source: dateTime,second: 0, millisecond: 0, microsecond: 0);
   }
 
-  String _formatDate(DateTime? dateTime){
+  static DateTime? _convertHm(DateTime? date, String time) {
+    if (date == null) {
+      return null;
+    }
+    if (!RegExp(ValueConsts.hhColonMmPattern).hasMatch(time)) {
+      return null;
+    }
+    var timeArray = time.split(':');
+    return DateTimeUtil.copy(source: date,hour: int.parse(timeArray[0]),minute: int.parse(timeArray[1]));
+  }
+
+  String _formatDate(DateTime? dateTime) {
     if (dateTime == null) {
       return '';
     }
@@ -126,10 +162,31 @@ class TimeRecord {
       {DateTime? startDateTime,
       DateTime? endDateTime,
       String? category,
-      String? content, bool? isRecording}) {
-    return TimeRecord._(
-      startDateTimeString: startDateTime?.toString() ?? startDateTimeString,
-      endDateTimeString: endDateTime?.toString() ?? endDateTimeString,
+      String? content,
+      bool? isRecording}) {
+    return TimeRecord.fromDateTime(
+      startDateTime: startDateTime ?? this.startDateTime,
+      endDateTime: endDateTime ?? this.endDateTime,
+      category: category ?? this.category,
+      content: content ?? this.content,
+      isRecording: isRecording ?? this.isRecording,
+    );
+  }
+
+  TimeRecord copyWithHm({
+    DateTime? startDate,
+    String? startTimeString,
+    DateTime? endDate,
+    String? endTimeString,
+    String? category,
+    String? content,
+    bool? isRecording,
+  }){
+    return TimeRecord.fromHmString(
+      startDate: startDate ?? startDateTime,
+      startTimeString: startTimeString ?? formattedStartTime,
+      endDate: endDate ?? endDateTime,
+      endTimeString: endTimeString ?? formattedEndTime,
       category: category ?? this.category,
       content: content ?? this.content,
       isRecording: isRecording ?? this.isRecording,

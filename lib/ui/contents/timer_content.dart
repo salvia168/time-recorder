@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:time_recorder/consts/value_consts.dart';
-import 'package:time_recorder/util/hm_formatter.dart';
+import 'package:time_recorder/ui/parts/update_dialog.dart';
 
 import '../../data/time_record.dart';
 import '../../db/csv_db.dart';
@@ -20,13 +20,13 @@ class TimerContent extends StatefulWidget {
 }
 
 class _TimerContentState extends State<TimerContent> {
-  final TextEditingController _updateStartTimeController =
-      TextEditingController();
-  final TextEditingController _updateEndTimeController =
-      TextEditingController();
-  final TextEditingController _updateSpanController = TextEditingController();
-  final TextEditingController _updateContentController =
-      TextEditingController();
+  // final TextEditingController _updateStartTimeController =
+  //     TextEditingController();
+  // final TextEditingController _updateEndTimeController =
+  //     TextEditingController();
+  // final TextEditingController _updateSpanController = TextEditingController();
+  // final TextEditingController _updateContentController =
+  //     TextEditingController();
 
   final RecordData _recordData = RecordData();
   final TextEditingController _controller = TextEditingController();
@@ -146,8 +146,18 @@ class _TimerContentState extends State<TimerContent> {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (BuildContext context) =>
-                          _createUpdateDialog(timeRecord),
+                      builder: (BuildContext context) => UpdateDialog(
+                          timeRecord: timeRecord,
+                          onConfirmed: (newTimeRecord) {
+                            var index =
+                                _recordData.timeRecordList.indexOf(timeRecord);
+                            setState(() {
+                              _recordData.timeRecordList.remove(timeRecord);
+                              _recordData.timeRecordList.insert(
+                                  index,
+                                  newTimeRecord);
+                            });
+                          }),
                     );
                   },
                 ),
@@ -163,143 +173,127 @@ class _TimerContentState extends State<TimerContent> {
     }
     setState(() {
       _recordData.timeRecordList.remove(_recordData.recordingData);
-      _recordData.timeRecordList
-          .add(_recordData.recordingData!.copyWith(endDateTime: endTime,isRecording: false));
+      _recordData.timeRecordList.add(_recordData.recordingData!
+          .copyWith(endDateTime: endTime, isRecording: false));
     });
-    await _db.create(_recordData.recordingData!.copyWith(endDateTime: endTime, isRecording: false));
+    await _db.create(_recordData.recordingData!
+        .copyWith(endDateTime: endTime, isRecording: false));
     _recordData.recordingData = null;
   }
 
   _startRecord({String content = ''}) async {
     await _stopRecord();
     _recordData.recordingData = TimeRecord.fromDateTime(
-        startDateTime: DateTime.now(), category: 'テストPJ', content: content,isRecording: true);
+        startDateTime: DateTime.now(),
+        category: 'テストPJ',
+        content: content,
+        isRecording: true);
     setState(() {
       _recordData.timeRecordList.add(_recordData.recordingData!);
     });
   }
 
-  TextField _createTimeTextField(
-      {required TextEditingController controller,
-      required String labelText,
-      required DateTime? dateTime}) {
-    return TextField(
-      controller: controller,
-      inputFormatters: [HmFormatter()],
-      decoration: InputDecoration(
-          labelText: labelText,
-          hintText:
-              dateTime == null ? 'hh:mm' : DateFormat.Hm().format(dateTime),
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.schedule_outlined),
-            onPressed: () async {
-              var time = await showTimePicker(
-                context: context,
-                initialTime: TimeOfDay(
-                  hour: dateTime?.hour ?? 0,
-                  minute: dateTime?.minute ?? 0,
-                ),
-              );
-              if (time != null) {
-                print(
-                    '時間：${DateFormat.Hm().format(DateTime(1, 1, 1, time.hour, time.minute))}');
-                controller.text = DateFormat.Hm()
-                    .format(DateTime(1, 1, 1, time.hour, time.minute));
-              }
-            },
-          )),
-    );
-  }
+// Dialog _createUpdateDialog(TimeRecord timeRecord) {
+//   _updateStartTimeController.text = timeRecord.formattedStartTime;
+//   _updateEndTimeController.text = timeRecord.formattedEndTime;
+//   _updateSpanController.text = timeRecord.formattedSpanHour;
+//   _updateContentController.text = timeRecord.content;
+//   return Dialog(
+//     child: Padding(
+//         padding: StyleConsts.padding32,
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           crossAxisAlignment: CrossAxisAlignment.end,
+//           children: [
+//             Column(
+//               mainAxisSize: MainAxisSize.min,
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Row(
+//                   mainAxisSize: MainAxisSize.min,
+//                   children: [
+//                     SizedBox(
+//                       width: StyleConsts.value128,
+//                       child: TimeTextField(
+//                         context: context,
+//                         controller: _updateStartTimeController,
+//                         labelText: '開始',
+//                         dateTime: timeRecord.startDateTime,
+//                       ),
+//                     ),
+//                     StyleConsts.sizedBoxW16,
+//                     SizedBox(
+//                       width: StyleConsts.value128,
+//                       child: TimeTextField(
+//                         context: context,
+//                         controller: _updateEndTimeController,
+//                         labelText: '終了',
+//                         dateTime: timeRecord.endDateTime,
+//                       ),
+//                     ),
+//                     StyleConsts.sizedBoxW16,
+//                     SizedBox(
+//                       width: StyleConsts.value80,
+//                       child: TextField(
+//                         enabled: false,
+//                         controller: _updateSpanController,
+//                         decoration: const InputDecoration(
+//                           labelText: '時間',
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//                 StyleConsts.sizedBoxH32,
+//                 SizedBox(
+//                   width: StyleConsts.value208,
+//                   child: TextField(
+//                     controller: _updateContentController,
+//                     decoration: const InputDecoration(labelText: '内容'),
+//                   ),
+//                 ),
+//                 StyleConsts.sizedBoxH48,
+//               ],
+//             ),
+//             Row(
+//               mainAxisSize: MainAxisSize.min,
+//               children: [
+//                 TextButton(
+//                   onPressed: () {
+//                     Navigator.pop(context);
+//                   },
+//                   child: const Text('キャンセル'),
+//                 ),
+//                 StyleConsts.sizedBoxW16,
+//                 TextButton(
+//                   onPressed: () {
+//                     var index =
+//                         _recordData.timeRecordList.indexOf(timeRecord);
+//                     setState(() {
+//                       _recordData.timeRecordList.remove(timeRecord);
+//                       _recordData.timeRecordList.insert(
+//                           index,
+//                           timeRecord.copyWith(
+//                               content: _updateContentController.text));
+//                     });
+//                     Navigator.pop(context);
+//                   },
+//                   child: const Text('編集'),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         )),
+//   );
+// }
 
-  Dialog _createUpdateDialog(TimeRecord timeRecord) {
-    _updateStartTimeController.text = timeRecord.formattedStartTime;
-    _updateEndTimeController.text = timeRecord.formattedEndTime;
-    _updateSpanController.text = timeRecord.formattedSpanHour;
-    _updateContentController.text = timeRecord.content;
-    return Dialog(
-      child: Padding(
-          padding: StyleConsts.padding32,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: StyleConsts.value128,
-                        child: _createTimeTextField(
-                          controller: _updateStartTimeController,
-                          labelText: '開始',
-                          dateTime: timeRecord.startDateTime,
-                        ),
-                      ),
-                      StyleConsts.sizedBoxW16,
-                      SizedBox(
-                        width: StyleConsts.value128,
-                        child: _createTimeTextField(
-                          controller: _updateEndTimeController,
-                          labelText: '終了',
-                          dateTime: timeRecord.endDateTime,
-                        ),
-                      ),
-                      StyleConsts.sizedBoxW16,
-                      SizedBox(
-                        width: StyleConsts.value80,
-                        child: TextField(
-                          enabled: false,
-                          controller: _updateSpanController,
-                          decoration: const InputDecoration(
-                            labelText: '時間',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  StyleConsts.sizedBoxH32,
-                  SizedBox(
-                    width: StyleConsts.value208,
-                    child: TextField(
-                      controller: _updateContentController,
-                      decoration: const InputDecoration(labelText: '内容'),
-                    ),
-                  ),
-                  StyleConsts.sizedBoxH48,
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('キャンセル'),
-                  ),
-                  StyleConsts.sizedBoxW16,
-                  TextButton(
-                    onPressed: () {
-                      var index =
-                          _recordData.timeRecordList.indexOf(timeRecord);
-                      setState(() {
-                        _recordData.timeRecordList.remove(timeRecord);
-                        _recordData.timeRecordList.insert(
-                            index,
-                            timeRecord.copyWith(
-                                content: _updateContentController.text));
-                      });
-                      Navigator.pop(context);
-                    },
-                    child: const Text('編集'),
-                  ),
-                ],
-              ),
-            ],
-          )),
-    );
-  }
+// void updateData(
+//     String startTime, String endTime, String content, TimeRecord timeRecord) {
+//   var index = _recordData.timeRecordList.indexOf(timeRecord);
+//   setState(() {
+//     _recordData.timeRecordList.remove(timeRecord);
+//     _recordData.timeRecordList.insert(
+//         index, timeRecord.copyWith(content: _updateContentController.text));
+//   });
+// }
 }
