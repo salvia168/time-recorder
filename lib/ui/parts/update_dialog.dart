@@ -20,6 +20,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
   final TextEditingController _startTimeController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
   final TextEditingController _spanController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
   @override
@@ -27,6 +28,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
     _startTimeController.text = widget.timeRecord.formattedStartTime;
     _endTimeController.text = widget.timeRecord.formattedEndTime;
     _spanController.text = widget.timeRecord.formattedSpanHour;
+    _categoryController.text = widget.timeRecord.category;
     _contentController.text = widget.timeRecord.content;
   }
 
@@ -90,12 +92,25 @@ class _UpdateDialogState extends State<UpdateDialog> {
                     ],
                   ),
                   StyleConsts.sizedBoxH32,
-                  SizedBox(
-                    width: StyleConsts.value208,
-                    child: TextField(
-                      controller: _contentController,
-                      decoration: const InputDecoration(labelText: '内容'),
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: StyleConsts.value208,
+                        child: TextField(
+                          controller: _categoryController,
+                          decoration: const InputDecoration(labelText: 'カテゴリ'),
+                        ),
+                      ),
+                      StyleConsts.sizedBoxW16,
+                      SizedBox(
+                        width: StyleConsts.value208,
+                        child: TextField(
+                          controller: _contentController,
+                          decoration: const InputDecoration(labelText: '内容'),
+                        ),
+                      ),
+                    ],
                   ),
                   StyleConsts.sizedBoxH48,
                 ],
@@ -121,6 +136,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                                 endDate: widget.timeRecord.endDateTime ??
                                     DateTime.now(),
                                 endTimeString: _endTimeController.text,
+                                category: _categoryController.text,
                                 content: _contentController.text);
                             if (newTimeRecord.formattedSpanHour ==
                                 ValueConsts.errorString) {

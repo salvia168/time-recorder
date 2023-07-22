@@ -21,16 +21,9 @@ class TimerContent extends StatefulWidget {
 }
 
 class _TimerContentState extends State<TimerContent> {
-  // final TextEditingController _updateStartTimeController =
-  //     TextEditingController();
-  // final TextEditingController _updateEndTimeController =
-  //     TextEditingController();
-  // final TextEditingController _updateSpanController = TextEditingController();
-  // final TextEditingController _updateContentController =
-  //     TextEditingController();
-
   final RecordData _recordData = RecordData();
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
   final DbBase _db = CsvDb();
   final DateFormat _dateFormat = DateFormat(ValueConsts.dateFormatPattern);
 
@@ -68,15 +61,28 @@ class _TimerContentState extends State<TimerContent> {
         Row(
           children: [
             SizedBox(
-              width: 300,
+              width: StyleConsts.value208,
               child: TextField(
-                controller: _controller,
+                decoration: const InputDecoration(
+                    labelText: 'カテゴリ'
+                ),
+                controller: _categoryController,
+              ),
+            ),
+            StyleConsts.sizedBoxW16,
+            SizedBox(
+              width: StyleConsts.value208,
+              child: TextField(
+                decoration: const InputDecoration(
+                  labelText: '内容'
+                ),
+                controller: _contentController,
               ),
             ),
             StyleConsts.sizedBoxW16,
             ElevatedButton(
               onPressed: () async {
-                await _startRecord(content: _controller.text);
+                await _startRecord(category: _categoryController.text ,content: _contentController.text);
               },
               child: const Text('開始'),
             ),
@@ -88,20 +94,6 @@ class _TimerContentState extends State<TimerContent> {
           ],
         ),
         StyleConsts.sizedBoxH32,
-        // Row(
-        //   children: [
-        //     ElevatedButton(
-        //       onPressed: () {
-        //         _startRecord(content: '朝会');
-        //       },
-        //       child: Text('朝会'),
-        //     ),
-        //     ElevatedButton(
-        //       onPressed: _stopRecord,
-        //       child: Text('停止'),
-        //     ),
-        //   ],
-        // ),
         Text(
           _dateFormat.format(DateTime.now()),
           style: Theme.of(context).textTheme.headlineMedium,
@@ -133,8 +125,8 @@ class _TimerContentState extends State<TimerContent> {
     // List<String> labels = ['開始', '終了', '時間', 'カテゴリ', '内容'];
     // List<bool> isNumericList = [true, true, true, false, false];
 
-    List<String> labels = ['', '開始', '終了', '時間', '内容', '編集'];
-    List<bool> isNumericList = [false, true, true, true, false, false];
+    List<String> labels = ['', '開始', '終了', '時間', 'カテゴリ', '内容', '編集'];
+    List<bool> isNumericList = [false, true, true, true,false, false, false];
     for (int i = 0; i < labels.length; i++) {
       columns.add(DataColumn(
         numeric: isNumericList[i],
@@ -158,7 +150,7 @@ class _TimerContentState extends State<TimerContent> {
         DataCell(SelectableText(timeRecord.formattedStartTime)),
         DataCell(SelectableText(timeRecord.formattedEndTime)),
         DataCell(SelectableText(timeRecord.formattedSpanHour)),
-        // DataCell(SelectableText(timeRecord.category)),
+        DataCell(SelectableText(timeRecord.category)),
         DataCell(SelectableText(timeRecord.content)),
         DataCell(
           timeRecord.isRecording
@@ -204,11 +196,11 @@ class _TimerContentState extends State<TimerContent> {
     });
   }
 
-  _startRecord({String content = ''}) async {
+  _startRecord({String category = '',String content = ''}) async {
     await _stopRecord();
     _recordData.recordingData = TimeRecord.fromDateTime(
         startDateTime: DateTime.now(),
-        category: 'テストPJ',
+        category: category,
         content: content,
         isRecording: true);
     setState(() {
