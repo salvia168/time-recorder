@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:time_recorder/consts/value_consts.dart';
+import 'package:time_recorder/ui/parts/blink.dart';
 import 'package:time_recorder/ui/parts/update_dialog.dart';
 
 import '../../data/time_record.dart';
@@ -43,6 +44,27 @@ class _TimerContentState extends State<TimerContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        Row(
+          children: [
+            Blink(
+              visible: _recordData.recordingData!=null,
+              duration: const Duration(seconds: 1),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.timer_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  StyleConsts.sizedBoxW8,
+                  Text('計測中',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ],
+        ),
         Row(
           children: [
             SizedBox(
@@ -153,9 +175,8 @@ class _TimerContentState extends State<TimerContent> {
                                 _recordData.timeRecordList.indexOf(timeRecord);
                             setState(() {
                               _recordData.timeRecordList.remove(timeRecord);
-                              _recordData.timeRecordList.insert(
-                                  index,
-                                  newTimeRecord);
+                              _recordData.timeRecordList
+                                  .insert(index, newTimeRecord);
                             });
                           }),
                     );
@@ -178,7 +199,9 @@ class _TimerContentState extends State<TimerContent> {
     });
     await _db.create(_recordData.recordingData!
         .copyWith(endDateTime: endTime, isRecording: false));
-    _recordData.recordingData = null;
+    setState((){
+      _recordData.recordingData = null;
+    });
   }
 
   _startRecord({String content = ''}) async {
