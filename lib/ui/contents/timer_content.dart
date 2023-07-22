@@ -11,8 +11,6 @@ import '../../consts/style_consts.dart';
 
 class TimerContent extends StatefulWidget {
   const TimerContent({super.key, required this.futureRead});
-
-  // final Future<void> futureRead;
   final Future<List<TimeRecord>> futureRead;
 
   @override
@@ -20,14 +18,6 @@ class TimerContent extends StatefulWidget {
 }
 
 class _TimerContentState extends State<TimerContent> {
-  // final TextEditingController _updateStartTimeController =
-  //     TextEditingController();
-  // final TextEditingController _updateEndTimeController =
-  //     TextEditingController();
-  // final TextEditingController _updateSpanController = TextEditingController();
-  // final TextEditingController _updateContentController =
-  //     TextEditingController();
-
   final RecordData _recordData = RecordData();
   final TextEditingController _controller = TextEditingController();
   final DbBase _db = CsvDb();
@@ -66,20 +56,6 @@ class _TimerContentState extends State<TimerContent> {
           ],
         ),
         StyleConsts.sizedBoxH32,
-        // Row(
-        //   children: [
-        //     ElevatedButton(
-        //       onPressed: () {
-        //         _startRecord(content: '朝会');
-        //       },
-        //       child: Text('朝会'),
-        //     ),
-        //     ElevatedButton(
-        //       onPressed: _stopRecord,
-        //       child: Text('停止'),
-        //     ),
-        //   ],
-        // ),
         Text(
           _dateFormat.format(DateTime.now()),
           style: Theme.of(context).textTheme.headlineMedium,
@@ -192,108 +168,4 @@ class _TimerContentState extends State<TimerContent> {
       _recordData.timeRecordList.add(_recordData.recordingData!);
     });
   }
-
-// Dialog _createUpdateDialog(TimeRecord timeRecord) {
-//   _updateStartTimeController.text = timeRecord.formattedStartTime;
-//   _updateEndTimeController.text = timeRecord.formattedEndTime;
-//   _updateSpanController.text = timeRecord.formattedSpanHour;
-//   _updateContentController.text = timeRecord.content;
-//   return Dialog(
-//     child: Padding(
-//         padding: StyleConsts.padding32,
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           crossAxisAlignment: CrossAxisAlignment.end,
-//           children: [
-//             Column(
-//               mainAxisSize: MainAxisSize.min,
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Row(
-//                   mainAxisSize: MainAxisSize.min,
-//                   children: [
-//                     SizedBox(
-//                       width: StyleConsts.value128,
-//                       child: TimeTextField(
-//                         context: context,
-//                         controller: _updateStartTimeController,
-//                         labelText: '開始',
-//                         dateTime: timeRecord.startDateTime,
-//                       ),
-//                     ),
-//                     StyleConsts.sizedBoxW16,
-//                     SizedBox(
-//                       width: StyleConsts.value128,
-//                       child: TimeTextField(
-//                         context: context,
-//                         controller: _updateEndTimeController,
-//                         labelText: '終了',
-//                         dateTime: timeRecord.endDateTime,
-//                       ),
-//                     ),
-//                     StyleConsts.sizedBoxW16,
-//                     SizedBox(
-//                       width: StyleConsts.value80,
-//                       child: TextField(
-//                         enabled: false,
-//                         controller: _updateSpanController,
-//                         decoration: const InputDecoration(
-//                           labelText: '時間',
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 StyleConsts.sizedBoxH32,
-//                 SizedBox(
-//                   width: StyleConsts.value208,
-//                   child: TextField(
-//                     controller: _updateContentController,
-//                     decoration: const InputDecoration(labelText: '内容'),
-//                   ),
-//                 ),
-//                 StyleConsts.sizedBoxH48,
-//               ],
-//             ),
-//             Row(
-//               mainAxisSize: MainAxisSize.min,
-//               children: [
-//                 TextButton(
-//                   onPressed: () {
-//                     Navigator.pop(context);
-//                   },
-//                   child: const Text('キャンセル'),
-//                 ),
-//                 StyleConsts.sizedBoxW16,
-//                 TextButton(
-//                   onPressed: () {
-//                     var index =
-//                         _recordData.timeRecordList.indexOf(timeRecord);
-//                     setState(() {
-//                       _recordData.timeRecordList.remove(timeRecord);
-//                       _recordData.timeRecordList.insert(
-//                           index,
-//                           timeRecord.copyWith(
-//                               content: _updateContentController.text));
-//                     });
-//                     Navigator.pop(context);
-//                   },
-//                   child: const Text('編集'),
-//                 ),
-//               ],
-//             ),
-//           ],
-//         )),
-//   );
-// }
-
-// void updateData(
-//     String startTime, String endTime, String content, TimeRecord timeRecord) {
-//   var index = _recordData.timeRecordList.indexOf(timeRecord);
-//   setState(() {
-//     _recordData.timeRecordList.remove(timeRecord);
-//     _recordData.timeRecordList.insert(
-//         index, timeRecord.copyWith(content: _updateContentController.text));
-//   });
-// }
 }
