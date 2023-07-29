@@ -7,10 +7,10 @@ import '../../consts/style_consts.dart';
 
 class UpdateDialog extends StatefulWidget {
   const UpdateDialog(
-      {super.key, required this.timeRecord, required this.onConfirmed});
+      {super.key, required this.timeRecord});
+
 
   final TimeRecord timeRecord;
-  final Function(TimeRecord) onConfirmed;
 
   @override
   State<UpdateDialog> createState() => _UpdateDialogState();
@@ -142,8 +142,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                                 ValueConsts.errorString) {
                               return;
                             }
-                            widget.onConfirmed(newTimeRecord);
-                            Navigator.pop(context);
+                            Navigator.pop(context,newTimeRecord);
                           },
                     child: const Text('編集'),
                   ),

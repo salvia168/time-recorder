@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:time_recorder/db/dummy_db.dart';
+import 'package:time_recorder/ui/contents/category_content.dart';
 import 'package:time_recorder/ui/contents/record_content.dart';
 import 'package:time_recorder/ui/contents/timer_content.dart';
 import 'package:time_recorder/data/time_record.dart';
@@ -25,7 +27,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // List<TimeRecord> list = [];
   // final TextEditingController _controller = TextEditingController();
-  DbBase db = CsvDb();
+  DbBase db = DummyDb();
   Future<List<TimeRecord>> futureRead = Future<List<TimeRecord>>(() {
     return [];
   });
@@ -37,7 +39,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     futureRead = Future<List<TimeRecord>>(() async {
       await db.init();
-      _recordData.timeRecordList = await db.readAll();
+      _recordData.timeRecordList = await db.readAllTimeRecord();
+      _recordData.categoryList = await db.readAllCategory();
+      _recordData.subcategoryList = await db.readAllSubcategory();
       return _recordData.timeRecordList;
     });
     super.initState();
@@ -248,6 +252,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   selectedIcon: Icon(Icons.book),
                   label: Text('記録'),
                 ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.category_outlined),
+                  selectedIcon: Icon(Icons.category),
+                  label: Text('カテゴリー'),
+                ),
               ],
               selectedIndex: _navigationIndex,
               onDestinationSelected: (index) {
@@ -269,12 +278,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _createContent() {
-    if (_navigationIndex == 1) {
-      return RecordContent(futureRead: futureRead);
-    } else {
+    if (_navigationIndex == 0) {
       return TimerContent(
         futureRead: futureRead,
       );
+    } else if(_navigationIndex == 1) {
+      return RecordContent(futureRead: futureRead);
+    } else if (_navigationIndex == 2) {
+      return CategoryContent(futureRead: futureRead,);
+    }else {
+      throw Exception("コンテントが設定されていないメニューが選択されました。");
     }
 // >>>>>>> master
   }

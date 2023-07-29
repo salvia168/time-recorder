@@ -11,6 +11,7 @@ class StyleConsts {
   static const double value24 = 24;
   static const double value32 = 32;
   static const double value48 = 48;
+  static const double value72 = 72;
   static const double value80 = 80;
   static const double value128 = 128;
   static const double value208 = 208;

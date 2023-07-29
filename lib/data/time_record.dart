@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -7,10 +6,13 @@ import '../util/date_time_util.dart';
 
 @immutable
 class TimeRecord {
-  static final DateFormat _dateFormat = DateFormat(ValueConsts.dateFormatPattern);
+  static final DateFormat _dateFormat =
+      DateFormat(ValueConsts.dateFormatPattern);
 
   final String startDateTimeString;
   final String endDateTimeString;
+  final int categoryId;
+  final int subcategoryId;
   final String category;
   final String content;
   final bool isRecording;
@@ -18,6 +20,8 @@ class TimeRecord {
   const TimeRecord._(
       {this.startDateTimeString = ValueConsts.invalidDateTime,
       this.endDateTimeString = ValueConsts.invalidDateTime,
+      this.categoryId = -1,
+      this.subcategoryId = -1,
       this.category = '',
       this.content = '',
       this.isRecording = false});
@@ -25,6 +29,8 @@ class TimeRecord {
   factory TimeRecord.fromDateTime({
     DateTime? startDateTime,
     DateTime? endDateTime,
+    int categoryId = -1,
+    int subcategoryId = -1,
     String category = '',
     String content = '',
     bool isRecording = false,
@@ -33,6 +39,8 @@ class TimeRecord {
       startDateTimeString:
           startDateTime?.toString() ?? ValueConsts.invalidDateTime,
       endDateTimeString: endDateTime?.toString() ?? ValueConsts.invalidDateTime,
+      categoryId: categoryId,
+      subcategoryId: subcategoryId,
       category: category,
       content: content,
       isRecording: isRecording,
@@ -42,6 +50,8 @@ class TimeRecord {
   factory TimeRecord.fromString({
     String startDateTime = ValueConsts.invalidDateTime,
     String endDateTime = ValueConsts.invalidDateTime,
+    int categoryId = -1,
+    int subcategoryId = -1,
     String category = '',
     String content = '',
     bool isRecording = false,
@@ -49,6 +59,8 @@ class TimeRecord {
     return TimeRecord.fromDateTime(
       startDateTime: _convertDateTime(startDateTime),
       endDateTime: _convertDateTime(endDateTime),
+      categoryId: categoryId,
+      subcategoryId: subcategoryId,
       category: category,
       content: content,
       isRecording: isRecording,
@@ -60,6 +72,8 @@ class TimeRecord {
     String startTimeString = ValueConsts.invalidDateTime,
     DateTime? endDate,
     String endTimeString = ValueConsts.invalidDateTime,
+    int categoryId = -1,
+    int subcategoryId = -1,
     String category = '',
     String content = '',
     bool isRecording = false,
@@ -68,8 +82,10 @@ class TimeRecord {
     var endDateTime = _convertHm(endDate, endTimeString);
     return TimeRecord._(
       startDateTimeString:
-      startDateTime?.toString() ?? ValueConsts.invalidDateTime,
+          startDateTime?.toString() ?? ValueConsts.invalidDateTime,
       endDateTimeString: endDateTime?.toString() ?? ValueConsts.invalidDateTime,
+      categoryId: categoryId,
+      subcategoryId: subcategoryId,
       category: category,
       content: content,
       isRecording: isRecording,
@@ -137,7 +153,8 @@ class TimeRecord {
       return null;
     }
     var dateTime = DateTime.parse(string);
-    return DateTimeUtil.copy(source: dateTime,second: 0, millisecond: 0, microsecond: 0);
+    return DateTimeUtil.copy(
+        source: dateTime, second: 0, millisecond: 0, microsecond: 0);
   }
 
   static DateTime? _convertHm(DateTime? date, String time) {
@@ -148,7 +165,10 @@ class TimeRecord {
       return null;
     }
     var timeArray = time.split(':');
-    return DateTimeUtil.copy(source: date,hour: int.parse(timeArray[0]),minute: int.parse(timeArray[1]));
+    return DateTimeUtil.copy(
+        source: date,
+        hour: int.parse(timeArray[0]),
+        minute: int.parse(timeArray[1]));
   }
 
   String _formatDate(DateTime? dateTime) {
@@ -161,12 +181,16 @@ class TimeRecord {
   TimeRecord copyWith(
       {DateTime? startDateTime,
       DateTime? endDateTime,
+      int? categoryId = -1,
+      int? subcategoryId = -1,
       String? category,
       String? content,
       bool? isRecording}) {
     return TimeRecord.fromDateTime(
       startDateTime: startDateTime ?? this.startDateTime,
       endDateTime: endDateTime ?? this.endDateTime,
+      categoryId: categoryId ?? this.categoryId,
+      subcategoryId: subcategoryId ?? this.subcategoryId,
       category: category ?? this.category,
       content: content ?? this.content,
       isRecording: isRecording ?? this.isRecording,
@@ -178,15 +202,19 @@ class TimeRecord {
     String? startTimeString,
     DateTime? endDate,
     String? endTimeString,
+    int? categoryId = -1,
+    int? subcategoryId = -1,
     String? category,
     String? content,
     bool? isRecording,
-  }){
+  }) {
     return TimeRecord.fromHmString(
       startDate: startDate ?? startDateTime,
       startTimeString: startTimeString ?? formattedStartTime,
       endDate: endDate ?? endDateTime,
       endTimeString: endTimeString ?? formattedEndTime,
+      categoryId: categoryId ?? this.categoryId,
+      subcategoryId: subcategoryId ?? this.subcategoryId,
       category: category ?? this.category,
       content: content ?? this.content,
       isRecording: isRecording ?? this.isRecording,

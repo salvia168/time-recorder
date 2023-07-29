@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:time_recorder/consts/value_consts.dart';
+import 'package:time_recorder/data/record_category.dart';
+import 'package:time_recorder/data/record_subcategory.dart';
 import 'package:time_recorder/ui/parts/blink.dart';
+import 'package:time_recorder/ui/parts/category_dropdown.dart';
 import 'package:time_recorder/ui/parts/update_dialog.dart';
 
 import '../../data/time_record.dart';
@@ -22,10 +25,13 @@ class TimerContent extends StatefulWidget {
 
 class _TimerContentState extends State<TimerContent> {
   final RecordData _recordData = RecordData();
-  final TextEditingController _categoryController = TextEditingController();
+
+  // final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   final DbBase _db = CsvDb();
   final DateFormat _dateFormat = DateFormat(ValueConsts.dateFormatPattern);
+  RecordCategory? selectedCategory;
+  RecordSubcategory? selectedSubcategory;
 
   @override
   void initState() {
@@ -40,7 +46,7 @@ class _TimerContentState extends State<TimerContent> {
         Row(
           children: [
             Blink(
-              visible: _recordData.recordingData!=null,
+              visible: _recordData.recordingData != null,
               duration: const Duration(seconds: 1),
               child: Row(
                 children: [
@@ -60,29 +66,87 @@ class _TimerContentState extends State<TimerContent> {
         ),
         Row(
           children: [
-            SizedBox(
-              width: StyleConsts.value208,
-              child: TextField(
-                decoration: const InputDecoration(
-                    labelText: 'カテゴリ'
-                ),
-                controller: _categoryController,
-              ),
+            CategoryDropdown<RecordCategory>(
+              selectedCategory: selectedCategory,
+              categoryList: _recordData.categoryList,
+              onChanged: (RecordCategory? newValue) {
+                setState(() {
+                  selectedSubcategory = null;
+                  selectedCategory = newValue;
+                });
+              },
             ),
+            // SizedBox(
+            //   width: StyleConsts.value208,
+            //   child: DropdownButton<RecordCategory>(
+            //     itemHeight: StyleConsts.value72,
+            //     hint: const Text('カテゴリー'),
+            //     value: selectedCategory,
+            //     items: _recordData.categoryList
+            //         .map<DropdownMenuItem<RecordCategory>>(
+            //             (RecordCategory category) =>
+            //                 DropdownMenuItem<RecordCategory>(
+            //                     value: category, child: Text(category.name)))
+            //         .toList(),
+            //     onChanged: (RecordCategory? newValue) {
+            //       setState(() {
+            //         selectedSubcategory =null;
+            //         selectedCategory = newValue;
+            //       });
+            //     },
+            //     isExpanded: true,
+            //   ),
+            // ),
+            StyleConsts.sizedBoxW16,
+            CategoryDropdown<RecordSubcategory>(
+              label: 'サブカテゴリー',
+              selectedCategory: selectedSubcategory,
+              categoryList: _recordData.subcategoryList
+                  .where((element) =>
+                      element.parentId == (selectedCategory?.id ?? -1))
+                  .toList(),
+              onChanged: (RecordSubcategory? newValue) {
+                setState(() {
+                  selectedSubcategory = newValue;
+                });
+              },
+            ),
+            // SizedBox(
+            //   width: StyleConsts.value208,
+            //   child: DropdownButton<RecordSubcategory>(
+            //     itemHeight: StyleConsts.value72,
+            //     hint: const Text('サブカテゴリー'),
+            //     value: selectedSubcategory,
+            //     items: _recordData.subcategoryList
+            //         .where((element) =>
+            //             element.parentId == (selectedCategory?.id ?? -1))
+            //         .map<DropdownMenuItem<RecordSubcategory>>(
+            //             (RecordSubcategory category) =>
+            //                 DropdownMenuItem<RecordSubcategory>(
+            //                     value: category, child: Text(category.name)))
+            //         .toList(),
+            //     onChanged: (RecordSubcategory? newValue) {
+            //       setState(() {
+            //         selectedSubcategory = newValue;
+            //       });
+            //     },
+            //     isExpanded: true,
+            //   ),
+            // ),
             StyleConsts.sizedBoxW16,
             SizedBox(
               width: StyleConsts.value208,
               child: TextField(
-                decoration: const InputDecoration(
-                  labelText: '内容'
-                ),
+                decoration: const InputDecoration(labelText: '内容'),
                 controller: _contentController,
               ),
             ),
             StyleConsts.sizedBoxW16,
             ElevatedButton(
               onPressed: () async {
-                await _startRecord(category: _categoryController.text ,content: _contentController.text);
+                await _startRecord(
+                    category: selectedCategory?.name ?? '',
+                    content: _contentController.text);
               },
               child: const Text('開始'),
             ),
@@ -125,8 +189,17 @@ class _TimerContentState extends State<TimerContent> {
     // List<String> labels = ['開始', '終了', '時間', 'カテゴリ', '内容'];
     // List<bool> isNumericList = [true, true, true, false, false];
 
-    List<String> labels = ['', '開始', '終了', '時間', 'カテゴリ', '内容', '編集'];
-    List<bool> isNumericList = [false, true, true, true,false, false, false];
+    List<String> labels = ['', '開始', '終了', '時間', 'カテゴリ', 'サブカテゴリー', '内容', '編集'];
+    List<bool> isNumericList = [
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ];
     for (int i = 0; i < labels.length; i++) {
       columns.add(DataColumn(
         numeric: isNumericList[i],
@@ -150,28 +223,38 @@ class _TimerContentState extends State<TimerContent> {
         DataCell(SelectableText(timeRecord.formattedStartTime)),
         DataCell(SelectableText(timeRecord.formattedEndTime)),
         DataCell(SelectableText(timeRecord.formattedSpanHour)),
-        DataCell(SelectableText(timeRecord.category)),
+        DataCell(SelectableText(_recordData.categoryList
+            .firstWhere((element) => element.id == timeRecord.categoryId,
+                orElse: () => RecordCategory(name: ''))
+            .name)),
+        DataCell(SelectableText(_recordData.subcategoryList
+            .firstWhere(
+                (element) =>
+                    element.parentId == timeRecord.categoryId &&
+                    element.id == timeRecord.subcategoryId,
+                orElse: () => RecordSubcategory(name: ''))
+            .name)),
         DataCell(SelectableText(timeRecord.content)),
         DataCell(
           timeRecord.isRecording
               ? StyleConsts.sizedBox0
               : IconButton(
                   icon: const Icon(Icons.edit_outlined),
-                  onPressed: () {
-                    showDialog(
+                  onPressed: () async {
+                    TimeRecord? newTimeRecord = await showDialog<TimeRecord>(
                       context: context,
                       builder: (BuildContext context) => UpdateDialog(
-                          timeRecord: timeRecord,
-                          onConfirmed: (newTimeRecord) {
-                            var index =
-                                _recordData.timeRecordList.indexOf(timeRecord);
-                            setState(() {
-                              _recordData.timeRecordList.remove(timeRecord);
-                              _recordData.timeRecordList
-                                  .insert(index, newTimeRecord);
-                            });
-                          }),
+                        timeRecord: timeRecord,
+                      ),
                     );
+                    if (newTimeRecord != null) {
+                      var index =
+                          _recordData.timeRecordList.indexOf(timeRecord);
+                      setState(() {
+                        _recordData.timeRecordList.remove(timeRecord);
+                        _recordData.timeRecordList.insert(index, newTimeRecord);
+                      });
+                    }
                   },
                 ),
         ),
@@ -189,17 +272,19 @@ class _TimerContentState extends State<TimerContent> {
       _recordData.timeRecordList.add(_recordData.recordingData!
           .copyWith(endDateTime: endTime, isRecording: false));
     });
-    await _db.create(_recordData.recordingData!
+    await _db.createTimeRecord(_recordData.recordingData!
         .copyWith(endDateTime: endTime, isRecording: false));
-    setState((){
+    setState(() {
       _recordData.recordingData = null;
     });
   }
 
-  _startRecord({String category = '',String content = ''}) async {
+  _startRecord({String category = '', String content = ''}) async {
     await _stopRecord();
     _recordData.recordingData = TimeRecord.fromDateTime(
         startDateTime: DateTime.now(),
+        categoryId: selectedCategory?.id ?? -1,
+        subcategoryId: selectedSubcategory?.id ?? -1,
         category: category,
         content: content,
         isRecording: true);
